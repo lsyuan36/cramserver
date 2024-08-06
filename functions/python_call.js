@@ -21,7 +21,7 @@ function processFile(inputData) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             // Spawn a new child process to run the Python script
-            const pythonProcess = (0, child_process_1.spawn)('./venv/bin/python3', [pythonScriptPath]);
+            const pythonProcess = (0, child_process_1.spawn)('./.venv/bin/python3', [pythonScriptPath]);
             // Handle stdout data from the Python script
             pythonProcess.stdout.on('data', (data) => {
                 console.log(`Python script output: ${data}`);

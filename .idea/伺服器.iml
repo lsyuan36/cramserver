@@ -6,4 +6,7 @@
     <orderEntry type="jdk" jdkName="Python 3.11 (伺服器)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="$MODULE_DIR$/requirements.txt" />
+  </component>
 </module>
