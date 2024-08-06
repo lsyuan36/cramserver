@@ -4,7 +4,7 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 const archiver = require('archiver');
 const multer = require('multer');
-const { convertXlsxSheetToHtml, loadOrCreateMapping, generateIdToSheetNameMapping } = require('./functions/functions');
+const { convertXlsxSheetToHtml, loadOrCreateMapping, generateIdToSheetNameMapping, getSheetNames } = require('./functions/functions');
 const { processFile } = require('./functions/python_call');
 
 const app = express();
@@ -101,6 +101,7 @@ app.get('/', (req, res) => {
                 </table>
                 <button onclick="window.location.href='/generate-download-teachers-zip'">下載所有老師的PDF壓縮包</button>
                 <button onclick="window.location.href='/download/teacher-excel'">下載老師個別表.xlsx</button>
+                <button onclick="window.location.href='/download/teacher-salary'">下載老師薪水總表.xlsx</button>
                 <h2>學生個別表</h2>
                 <table>
                     <tbody>
@@ -141,6 +142,8 @@ app.post('/upload-and-process', upload.single('file'), (req, res) => {
 
     processFile(date).then(r => {
         console.log(r);
+        idToSheetName1 = loadOrCreateMapping(file1Path, mappingFile1Path, true);
+        idToSheetName2 = loadOrCreateMapping(file2Path, mappingFile2Path, true);
         res.redirect('/');
     }).catch(err => {
         console.error(err);
@@ -396,7 +399,17 @@ app.get('/download/student-excel', (req, res) => {
     });
 });
 
+// 下载老師薪水總表
+app.get('/download/teacher-salary', (req, res) => {
+    const file = path.join(__dirname, 'output/薪水總表.xlsx');
+    res.download(file, err => {
+        if (err) {
+            console.error('Error downloading file:', err);
+            res.status(500).send('Server error');
+        }
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
-

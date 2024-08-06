@@ -21,25 +21,29 @@ function getSheetNames(filePath) {
 }
 
 // 生成映射表
-function generateIdToSheetNameMapping(filePath) {
+function generateIdToSheetNameMapping(filePath, existingMapping = {}) {
     const sheetNames = getSheetNames(filePath);
-    const mapping = {};
+    const mapping = { ...existingMapping };
+
     sheetNames.forEach(name => {
-        const randomId = generateRandomString();
-        mapping[randomId] = name;
+        if (!Object.values(mapping).includes(name)) {
+            const randomId = generateRandomString();
+            mapping[randomId] = name;
+        }
     });
+
     return mapping;
 }
 
 // 加載或生成映射表
 function loadOrCreateMapping(filePath, mappingFilePath) {
+    let mapping = {};
     if (fs.existsSync(mappingFilePath)) {
-        return JSON.parse(fs.readFileSync(mappingFilePath));
-    } else {
-        const mapping = generateIdToSheetNameMapping(filePath);
-        fs.writeFileSync(mappingFilePath, JSON.stringify(mapping, null, 2));
-        return mapping;
+        mapping = JSON.parse(fs.readFileSync(mappingFilePath));
     }
+    const updatedMapping = generateIdToSheetNameMapping(filePath, mapping);
+    fs.writeFileSync(mappingFilePath, JSON.stringify(updatedMapping, null, 2));
+    return updatedMapping;
 }
 
 module.exports = {
