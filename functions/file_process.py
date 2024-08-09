@@ -1,4 +1,5 @@
 import pandas as pd
+import muti_student
 
 # Load the uploaded Excel file
 file_path = './input/上課記錄 (回覆).xlsx'
@@ -89,3 +90,4 @@ def get_records_for_month(month):
 # Get user input for month
 month = input('請輸入月份 (格式為 YYYY/MM): ')
 get_records_for_month(month)
+muti_student.muti_student()
