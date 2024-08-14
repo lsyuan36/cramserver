@@ -8,7 +8,7 @@ const { convertXlsxSheetToHtml, loadOrCreateMapping, generateIdToSheetNameMappin
 const { processFile } = require('./functions/python_call');
 
 const app = express();
-const port = 3000;
+const port = 5000;
 const current_month = '2024年8月份';
 
 // 设置静态文件夹
@@ -55,10 +55,19 @@ const studentUploadStorage = multer.diskStorage({
         cb(null, '學生個別表.xlsx');
     }
 });
+const teacherUploadStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, 'output'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, '老師個別表.xlsx');
+    }
+});
 const studentUpload = multer({ storage: studentUploadStorage });
+const teacherUpload = multer({ storage: teacherUploadStorage });
 
 // 主页路由处理
-app.get('/', (req, res) => {
+app.get('/controller', (req, res) => {
     let html = `
         <!DOCTYPE html>
         <html lang="en">
@@ -102,6 +111,13 @@ app.get('/', (req, res) => {
                 <button onclick="window.location.href='/generate-download-teachers-zip'">下載所有老師的PDF壓縮包</button>
                 <button onclick="window.location.href='/download/teacher-excel'">下載老師個別表.xlsx</button>
                 <button onclick="window.location.href='/download/teacher-salary'">下載老師薪水總表.xlsx</button>
+                <form action="/upload-teacher-excel" method="post" enctype="multipart/form-data">
+                    <div>
+                        <label for="teacherFile">上傳修改後的老師個別表：</label>
+                        <input type="file" name="teacherFile" id="teacherFile" required>
+                    </div>
+                    <button type="submit">上傳並重新載入老師生資料</button>
+                </form>
                 <h2>學生個別表</h2>
                 <table>
                     <tbody>
@@ -144,7 +160,7 @@ app.post('/upload-and-process', upload.single('file'), (req, res) => {
         console.log(r);
         idToSheetName1 = loadOrCreateMapping(file1Path, mappingFile1Path, true);
         idToSheetName2 = loadOrCreateMapping(file2Path, mappingFile2Path, true);
-        res.redirect('/');
+        res.redirect('/controller');
     }).catch(err => {
         console.error(err);
         res.status(500).send('文件处理失败');
@@ -158,7 +174,17 @@ app.post('/upload-student-excel', studentUpload.single('studentFile'), (req, res
         idToSheetName2 = generateIdToSheetNameMapping(newFilePath);
         fs.writeFileSync(mappingFile2Path, JSON.stringify(idToSheetName2));
     }
-    res.redirect('/');
+    res.redirect('/controller');
+});
+
+// 处理上传修改后的老師个别表并重新载入
+app.post('/upload-teacher-excel', teacherUpload.single('teacherFile'), (req, res) => {
+    const newFilePath1 = path.join(__dirname, 'output/老師個別表.xlsx');
+    if (fs.existsSync(newFilePath1)) {
+        idToSheetName1 = generateIdToSheetNameMapping(newFilePath1);
+        fs.writeFileSync(mappingFile1Path, JSON.stringify(idToSheetName1));
+    }
+    res.redirect('/controller');
 });
 
 // 显示老师个别表的工作表内容的路由处理
@@ -223,7 +249,8 @@ app.get('/view2/:id', (req, res) => {
 
 // 生成老师个别表的所有页面的 PDF 并下载 ZIP
 app.get('/generate-download-teachers-zip', async (req, res) => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const page = await browser.newPage();
 
     for (const id in idToSheetName1) {
@@ -301,7 +328,8 @@ app.get('/generate-download-teachers-zip', async (req, res) => {
 
 // 生成学生个别表的所有页面的 PDF 并下载 ZIP
 app.get('/generate-download-students-zip', async (req, res) => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const page = await browser.newPage();
 
     for (const id in idToSheetName2) {
@@ -410,6 +438,9 @@ app.get('/download/teacher-salary', (req, res) => {
     });
 });
 
+app.get('/', (req, res) => {
+     res.send('Server ON');
+});
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

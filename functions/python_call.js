@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processFile = processFile;
+exports.processFile = void 0;
 const child_process_1 = require("child_process");
 const path_1 = __importDefault(require("path"));
 // Define the path to the Python script
@@ -21,7 +21,7 @@ function processFile(inputData) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             // Spawn a new child process to run the Python script
-            const pythonProcess = (0, child_process_1.spawn)('./.venv/bin/python3', [pythonScriptPath]);
+            const pythonProcess = (0, child_process_1.spawn)('./venv/bin/python3', [pythonScriptPath]);
             // Handle stdout data from the Python script
             pythonProcess.stdout.on('data', (data) => {
                 console.log(`Python script output: ${data}`);
@@ -45,3 +45,4 @@ function processFile(inputData) {
         });
     });
 }
+exports.processFile = processFile;
