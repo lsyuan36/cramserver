@@ -125,7 +125,7 @@ app.get('/controller', (req, res) => {
 
     Object.keys(idToSheetName1).forEach((id, index) => {
         html += `<td><a href="/view1/${id}">${idToSheetName1[id]}</a></td>`;
-        if ((index + 1) % 5 === 0) {
+        if ((index + 1) % 10 === 0) {
             html += `</tr><tr>`;
         }
     });
@@ -163,7 +163,7 @@ app.get('/controller', (req, res) => {
 
     Object.keys(idToSheetName2).forEach((id, index) => {
         html += `<td><a href="/view2/${id}">${idToSheetName2[id]}</a></td>`;
-        if ((index + 1) % 5 === 0) {
+        if ((index + 1) % 10 === 0) {
             html += `</tr><tr>`;
         }
     });
@@ -172,15 +172,23 @@ app.get('/controller', (req, res) => {
                         </tr>
                     </tbody>
                 </table>
-                <button onclick="window.location.href='/generate-download-students-zip'">下載所有學生的PDF壓縮包</button>
-                <button onclick="window.location.href='/download/student-excel'">下載學生個別表.xlsx</button>
-                <form action="/upload-student-excel" method="post" enctype="multipart/form-data">
-                    <div>
-                        <label for="studentFile">上傳修改後的學生個別表：</label>
-                        <input type="file" name="studentFile" id="studentFile" required>
-                    </div>
-                    <button type="submit">上傳並重新載入學生資料</button>
-                </form>
+                <table>
+                    <td>
+                        <button onclick="window.location.href='/generate-download-students-zip'">下載所有學生的PDF壓縮包</button>                    
+                    </td>
+                    <td>
+                         <button onclick="window.location.href='/download/student-excel'">下載學生個別表.xlsx</button>
+                    </td>
+                    <td>
+                        <form action="/upload-student-excel" method="post" enctype="multipart/form-data">
+                            <div>
+                                <label for="studentFile">上傳修改後的學生個別表：</label>
+                                <input type="file" name="studentFile" id="studentFile" required>
+                            </div>
+                            <button type="submit">上傳並重新載入學生資料</button>
+                        </form>
+                    </td>                                        
+                </table>
             </div>
         </body>
         </html>

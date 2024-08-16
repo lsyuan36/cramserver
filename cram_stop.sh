@@ -1,10 +1,10 @@
 #!/bin/bash
-cd server
-if [ -f server.pid ]; then
-  PID=$(cat server.pid1)
+
+if [ -f server1.pid ]; then
+  PID=$(cat server1.pid)
   echo "Stopping server with PID $PID"
   kill $PID
-  rm server.pid
+  rm server1.pid
   echo "Server stopped"
 else
   echo "Server is not running"
