@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/伺服器.iml" filepath="$PROJECT_DIR$/.idea/伺服器.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/cramserver.iml" filepath="$PROJECT_DIR$/.idea/cramserver.iml" />
     </modules>
   </component>
 </project>

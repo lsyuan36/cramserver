@@ -1,9 +1,10 @@
 import pandas as pd
 import muti_student
+import salary_recalculation
 
 # Load the uploaded Excel file
 file_path = './input/上課記錄 (回覆).xlsx'
-df = pd.read_excel(file_path, sheet_name='表單回應 1')
+df = pd.read_excel(file_path)
 
 # Convert time columns to datetime
 df['開始時間'] = pd.to_datetime(df['開始時間'], format='%H:%M:%S').dt.time
@@ -90,4 +91,5 @@ def get_records_for_month(month):
 # Get user input for month
 month = input('請輸入月份 (格式為 YYYY/MM): ')
 get_records_for_month(month)
-muti_student.muti_student()
+muti_student.multi_student()
+salary_recalculation.salary_recalculation()

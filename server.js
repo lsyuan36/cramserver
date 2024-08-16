@@ -5,10 +5,10 @@ const puppeteer = require('puppeteer');
 const archiver = require('archiver');
 const multer = require('multer');
 const { convertXlsxSheetToHtml, loadOrCreateMapping, generateIdToSheetNameMapping, getSheetNames } = require('./functions/functions');
-const { processFile } = require('./functions/python_call');
+const { processFile , salary } = require('./functions/python_call');
 
 const app = express();
-const port = 5000;
+const port = 3000;
 const current_month = '2024年8月份';
 
 // 设置静态文件夹
@@ -36,6 +36,7 @@ createDirectoryIfNotExists(path.join(__dirname, 'output/老師'));
 createDirectoryIfNotExists(path.join(__dirname, 'output/學生'));
 createDirectoryIfNotExists(path.join(__dirname, 'input'));
 
+
 // 配置multer用于文件上传
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -45,6 +46,7 @@ const storage = multer.diskStorage({
         cb(null, '上課記錄 (回覆).xlsx');
     }
 });
+
 const upload = multer({ storage: storage });
 
 const studentUploadStorage = multer.diskStorage({
@@ -63,8 +65,17 @@ const teacherUploadStorage = multer.diskStorage({
         cb(null, '老師個別表.xlsx');
     }
 });
+const teacherbasedsalaryUploadStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, 'input'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, '基底薪資.xlsx');
+    }
+});
 const studentUpload = multer({ storage: studentUploadStorage });
 const teacherUpload = multer({ storage: teacherUploadStorage });
+const teacherbasedsalary = multer({storage: teacherbasedsalaryUploadStorage });
 
 // 主页路由处理
 app.get('/controller', (req, res) => {
@@ -80,17 +91,32 @@ app.get('/controller', (req, res) => {
         <body>
             <div class="container">
                 <h1>上課清單</h1>
-                <form action="/upload-and-process" method="post" enctype="multipart/form-data">
-                    <div>
-                        <label for="file">上傳新文件：</label>
-                        <input type="file" name="file" id="file" required>
-                    </div>
-                    <div>
-                        <label for="date">輸入日期 (yyyy/mm)：</label>
-                        <input type="text" name="date" id="date" placeholder="2024/08" required>
-                    </div>
-                    <button type="submit">上傳並處理文件</button>
-                </form>
+                <table>
+                    <td>
+                        <form action="/upload-and-process" method="post" enctype="multipart/form-data">
+                            <div>
+                                <label for="file">上傳新文件：</label>
+                                <input type="file" name="file" id="file" required>
+                            </div>
+                            <div>
+                                <label for="date">輸入日期 (yyyy/mm)：</label>
+                                <input type="text" name="date" id="date" placeholder="2024/08" required>
+                            </div>
+                            <button type="submit">上傳並處理文件</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/upload-based-salary" method="post" enctype="multipart/form-data">
+                            <div>
+                                <button onclick="window.location.href='/download/teacher-based-salary'">下載目前薪資基底表.xlsx</button>
+                                <label for="file">上傳薪資基底表：</label>
+                                <input type="file" name="basedSalaryFile" id="basedSalaryFile" required>
+                            </div>
+                            <button type="submit">上傳並處理文件</button>
+                        </form>
+                    </td>
+                </table>
+
                 <h2>老師個別表</h2>
                 <table>
                     <tbody>
@@ -108,16 +134,27 @@ app.get('/controller', (req, res) => {
                         </tr>
                     </tbody>
                 </table>
-                <button onclick="window.location.href='/generate-download-teachers-zip'">下載所有老師的PDF壓縮包</button>
-                <button onclick="window.location.href='/download/teacher-excel'">下載老師個別表.xlsx</button>
-                <button onclick="window.location.href='/download/teacher-salary'">下載老師薪水總表.xlsx</button>
-                <form action="/upload-teacher-excel" method="post" enctype="multipart/form-data">
-                    <div>
-                        <label for="teacherFile">上傳修改後的老師個別表：</label>
-                        <input type="file" name="teacherFile" id="teacherFile" required>
-                    </div>
-                    <button type="submit">上傳並重新載入老師生資料</button>
-                </form>
+                <table>
+                    <td>
+                        <button onclick="window.location.href='/generate-download-teachers-zip'">下載所有老師的PDF壓縮包</button>
+                    </td>
+                    <td>
+                        <button onclick="window.location.href='/download/teacher-excel'">下載老師個別表.xlsx</button>
+                    </td>
+                    <td>
+                        <button onclick="window.location.href='/download/teacher-salary'">下載老師薪水總表.xlsx</button>
+                    </td>
+                    <td>
+                        <form action="/upload-teacher-excel" method="post" enctype="multipart/form-data">
+                            <div>
+                                <label for="teacherFile">上傳修改後的老師個別表：</label>
+                                <input type="file" name="teacherFile" id="teacherFile" required>
+                            </div>
+                            <button type="submit">上傳並重新載入老師生資料</button>
+                        </form>   
+                    </td>
+                </table>    
+
                 <h2>學生個別表</h2>
                 <table>
                     <tbody>
@@ -184,6 +221,13 @@ app.post('/upload-teacher-excel', teacherUpload.single('teacherFile'), (req, res
         idToSheetName1 = generateIdToSheetNameMapping(newFilePath1);
         fs.writeFileSync(mappingFile1Path, JSON.stringify(idToSheetName1));
     }
+    res.redirect('/controller');
+});
+
+// 处理上传修改后的基底薪資并重新载入
+app.post('/upload-based-salary', teacherbasedsalary.single('basedSalaryFile'), (req, res) => {
+    // const newFilePath2 = path.join(__dirname, 'input/基底薪資.xlsx');
+    salary().then(r => console.log(r));
     res.redirect('/controller');
 });
 
@@ -438,10 +482,21 @@ app.get('/download/teacher-salary', (req, res) => {
     });
 });
 
+// 下载基底薪資
+app.get('/download/teacher-based-salary', (req, res) => {
+    const file = path.join(__dirname, 'input/基底薪資.xlsx');
+    res.download(file, err => {
+        if (err) {
+            console.error('Error downloading file:', err);
+            res.status(500).send('Server error');
+        }
+    });
+});
+
 app.get('/', (req, res) => {
      res.send('Server ON');
 });
 
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+    console.log(`Server is running at http://localhost:${port}/controller`);
 });

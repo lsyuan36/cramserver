@@ -1,0 +1,3 @@
+from salary_recalculation import salary_recalculation
+
+salary_recalculation()

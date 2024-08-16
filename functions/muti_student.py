@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def muti_student():
+def multi_student():
     # 加载Excel文件
     file_path = 'output/老師個別表.xlsx'
     xls = pd.ExcelFile(file_path)
