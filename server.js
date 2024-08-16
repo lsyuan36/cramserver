@@ -21,10 +21,15 @@ const file1Path = path.join(__dirname, 'output/老師個別表.xlsx');
 const file2Path = path.join(__dirname, 'output/學生個別表.xlsx');
 const mappingFile1Path = path.join(__dirname, 'mapping/teacher.json');
 const mappingFile2Path = path.join(__dirname, 'mapping/student.json');
+let idToSheetName1;
+let idToSheetName2;
 
-let idToSheetName1 = loadOrCreateMapping(file1Path, mappingFile1Path);
-let idToSheetName2 = loadOrCreateMapping(file2Path, mappingFile2Path);
-
+try {
+    idToSheetName1 = loadOrCreateMapping(file1Path, mappingFile1Path);
+    idToSheetName2 = loadOrCreateMapping(file2Path, mappingFile2Path);
+}catch (e){
+    console.log("ID Failed at initial")
+}
 // 创建目录（如果不存在）
 function createDirectoryIfNotExists(directory) {
     if (!fs.existsSync(directory)) {
@@ -73,6 +78,9 @@ const teacherbasedsalaryUploadStorage = multer.diskStorage({
         cb(null, '基底薪資.xlsx');
     }
 });
+
+
+
 const studentUpload = multer({ storage: studentUploadStorage });
 const teacherUpload = multer({ storage: teacherUploadStorage });
 const teacherbasedsalary = multer({storage: teacherbasedsalaryUploadStorage });

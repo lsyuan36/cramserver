@@ -12,8 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processFile = processFile;
-exports.salary = salary;
+exports.salary = exports.processFile = void 0;
 const child_process_1 = require("child_process");
 const path_1 = __importDefault(require("path"));
 // Define the path to the Python script
@@ -47,6 +46,7 @@ function processFile(inputData) {
         });
     });
 }
+exports.processFile = processFile;
 function salary() {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -73,3 +73,4 @@ function salary() {
         });
     });
 }
+exports.salary = salary;

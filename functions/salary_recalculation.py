@@ -1,3 +1,5 @@
+from operator import index
+
 import pandas as pd
 
 
@@ -7,10 +9,10 @@ def salary_recalculation():
     base_salary_file = "./input/基底薪資.xlsx"
 
     # 讀取老師個別表的所有試算頁
-    teacher_sheets = pd.read_excel(teacher_salary_file, sheet_name=None)
+    teacher_sheets = pd.read_excel(teacher_salary_file,sheet_name=None, engine='openpyxl')
 
     # 讀取基底薪資表
-    base_salary_df = pd.read_excel(base_salary_file)
+    base_salary_df = pd.read_excel(base_salary_file, engine='openpyxl')
 
     # 將基底薪資表轉換為字典方便查找
     base_salary_dict = pd.Series(base_salary_df.基底薪資.values, index=base_salary_df.老師姓名).to_dict()

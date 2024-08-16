@@ -1,7 +1,5 @@
 import pandas as pd
 import muti_student
-import salary_recalculation
-
 # Load the uploaded Excel file
 file_path = './input/上課記錄 (回覆).xlsx'
 df = pd.read_excel(file_path)
@@ -57,18 +55,6 @@ teacher_writer.close()
 
 print('檔案處理完成')
 
-# Calculate total salary for each teacher
-teacher_total_salary = teacher_df.groupby('老師姓名')['薪水'].sum().reset_index()
-teacher_total_salary.columns = ['老師姓名', '總薪水']
-
-# Write the total salary to a new sheet
-salary_writer = pd.ExcelWriter('./output/薪水總表.xlsx', engine='xlsxwriter')
-teacher_total_salary.to_excel(salary_writer, sheet_name='薪水總表', index=False)
-salary_writer.close()
-
-print('薪水總表處理完成')
-
-
 # Function to get records for a specific month
 def get_records_for_month(month):
     filtered_teacher_df = teacher_df[teacher_df['上課日期'].str.startswith(month)]
@@ -92,4 +78,10 @@ def get_records_for_month(month):
 month = input('請輸入月份 (格式為 YYYY/MM): ')
 get_records_for_month(month)
 muti_student.multi_student()
-salary_recalculation.salary_recalculation()
+
+
+from salary_recalculation import salary_recalculation
+salary_recalculation()
+
+from total_salary import salary_sum
+salary_sum()
