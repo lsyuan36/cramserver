@@ -101,7 +101,10 @@ app.get('/controller', (req, res) => {
                 <h1>上課清單</h1>
                 <table>
                     <td>
+                        <a href = "https://docs.google.com/spreadsheets/d/1q3JYAD0L0Kj9c47PbNPI0wvC8bbtWz1PAGYChWXg0Ps/edit?usp=sharing">
+                            <button>前往Google 試算表</button></a>
                         <form action="/upload-and-process" method="post" enctype="multipart/form-data">
+                            
                             <div>
                                 <label for="file">上傳新文件：</label>
                                 <input type="file" name="file" id="file" required>
@@ -116,7 +119,7 @@ app.get('/controller', (req, res) => {
                     <td>
                         <form action="/upload-based-salary" method="post" enctype="multipart/form-data">
                             <div>
-                                <button onclick="window.location.href='/download/teacher-based-salary'">下載目前薪資基底表.xlsx</button>
+                                <button onclick="window.location.href='/download/teacher-based-salary'">下載目前薪資基底表.xlsx</button><br>
                                 <label for="file">上傳薪資基底表：</label>
                                 <input type="file" name="basedSalaryFile" id="basedSalaryFile" required>
                             </div>
