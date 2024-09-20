@@ -1,6 +1,9 @@
 import pandas as pd
 import os
 
+from times_process import time_count
+
+
 def salary_sum():
     # 設定檔案路徑
     file_path = './output/老師個別表.xlsx'
@@ -53,4 +56,4 @@ def salary_sum():
         print(f"薪水總表已成功保存到 {summary_file_path}")
     except Exception as e:
         raise Exception(f"Error saving summary Excel file: {e}")
-
+    time_count()

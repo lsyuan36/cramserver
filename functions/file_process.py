@@ -11,7 +11,14 @@ df['結束時間'] = pd.to_datetime(df['結束時間'], format='%H:%M:%S').dt.ti
 # Calculate duration in hours
 df['開始時間'] = pd.to_datetime(df['上課日期'].astype(str) + ' ' + df['開始時間'].astype(str))
 df['結束時間'] = pd.to_datetime(df['上課日期'].astype(str) + ' ' + df['結束時間'].astype(str))
-df['時長(小時)'] = ((df['結束時間'] - df['開始時間']).dt.total_seconds() / 3600).round(1)
+df['時長(小時)'] =  ((df['結束時間'] - df['開始時間']).dt.total_seconds() / 3600).round(1)
+
+
+# if ((df['結束時間'] - df['開始時間']).dt.total_seconds() / 3600).round(1) >0 :
+#     df['時長(小時)'] =  ((df['結束時間'] - df['開始時間']).dt.total_seconds() / 3600).round(1)
+# else:
+#     df['時長(小時)'] =  (((df['結束時間'] - df['開始時間']).dt.total_seconds() / 3600).round(1))+12
+
 
 # Split records with multiple students into separate rows for student_df
 df_students = df.assign(學生姓名=df['學生姓名'].str.split(', ')).explode('學生姓名')
